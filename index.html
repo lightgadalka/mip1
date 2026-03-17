@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game</title>
+  <style>
+    :root {
+      --bg: #2160a8;
+      --card: #ffffff;
+      --text: #183a63;
+      --line: #d8e1ee;
+      --btn: #3b73b7;
+      --btn-hover: #2f66a8;
+      --btn-disabled: #83a7d1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--bg);
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+    }
+
+    .app {
+      width: min(920px, 100%);
+      min-height: 680px;
+      background: var(--card);
+      padding: 48px 44px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .top {
+      width: 100%;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .current {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .current-label {
+      font-size: 17px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .current-value {
+      font-size: 58px;
+      line-height: 1;
+    }
+
+    .scores {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .score-box {
+      width: 180px;
+      min-height: 98px;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .score-name {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-value {
+      font-size: 40px;
+      line-height: 1;
+    }
+
+    .winner {
+      display: none;
+      font-size: 58px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--line);
+      margin: 18px 0 26px;
+    }
+
+    .panel {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .row {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .numbers {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, 140px);
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .game-btn,
+    .dev-input {
+      min-height: 54px;
+      padding: 12px 18px;
+      font-size: 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      border: 1px solid #255793;
+    }
+
+    .game-btn {
+      background: var(--btn);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .game-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    .game-btn:disabled {
+      background: var(--btn-disabled);
+      color: #fff;
+      cursor: default;
+    }
+
+    .mode-btn {
+      width: 190px;
+    }
+
+    .player-btn {
+      width: 170px;
+    }
+
+    .num-btn {
+      width: 140px;
+    }
+
+    .main-btn {
+      width: 320px;
+    }
+
+    .move-btn {
+      width: 150px;
+    }
+
+    .dev-input {
+      width: 220px;
+      color: var(--text);
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .dev-input::-webkit-outer-spin-button,
+    .dev-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .dev-row {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        padding: 28px 18px 24px;
+      }
+
+      .numbers {
+        grid-template-columns: repeat(2, 140px);
+      }
+
+      .winner {
+        font-size: 42px;
+      }
+
+      .current-value {
+        font-size: 46px;
+      }
+    }
+  </style>
+  <script src="algorithms.js"></script>
+  <script src="mip11.js"></script>
+</head>
+<body>
+  <main class="app">
+    <h1 id="title" class="title">Minimax Game</h1>
+
+    <section class="top">
+      <div id="current-box" class="current">
+        <div class="current-label">Current Number</div>
+        <div id="current-value" class="current-value">-</div>
+      </div>
+
+      <div id="scores" class="scores">
+        <div class="score-box">
+          <div class="score-name">Human</div>
+          <div id="human-score" class="score-value">0</div>
+        </div>
+        <div class="score-box">
+          <div class="score-name">AI</div>
+          <div id="ai-score" class="score-value">0</div>
+        </div>
+      </div>
+
+      <div id="winner" class="winner"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="start-panel" class="panel">
+      <div class="row">
+        <button id="mode-minimax" class="game-btn mode-btn">Mode: Minimax</button>
+        <button id="mode-alphabeta" class="game-btn mode-btn">Mode: Alpha-Beta</button>
+      </div>
+
+      <div class="row">
+        <button id="player-human" class="game-btn player-btn">Start: Human</button>
+        <button id="player-ai" class="game-btn player-btn">Start: AI</button>
+      </div>
+
+      <div id="numbers" class="numbers"></div>
+
+      <div id="normal-start-row" class="row">
+        <button id="start-btn" class="game-btn main-btn">Start</button>
+      </div>
+
+      <div id="dev-row" class="row dev-row">
+        <input id="dev-input" class="dev-input" type="number" placeholder="Custom number" />
+        <button id="dev-start-btn" class="game-btn main-btn">Start Custom</button>
+      </div>
+    </section>
+
+    <section id="play-panel" class="panel">
+      <div class="row">
+        <button id="divide-2" class="game-btn move-btn">Divide by 2</button>
+        <button id="divide-3" class="game-btn move-btn">Divide by 3</button>
+      </div>
+    </section>
+
+    <section id="finish-panel" class="panel">
+      <div class="row">
+        <button id="restart-btn" class="game-btn main-btn">Restart</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
